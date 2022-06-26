@@ -136,7 +136,7 @@ On the other hand, blood pressure, insulin, and skin thickness also affect the l
 
 ![image](https://user-images.githubusercontent.com/90888090/175817099-66b32a64-44bb-4023-9b20-c35e5baf81ba.png)
 
-## Applying Base model for data partitioning 80% for training and 20% for testing
+## Applying Base model for data partitioning: 80% for training and 20% for testing
 ### Model 1: K-nearest Neighbors Algorithm
 - *Find best value of the hyperparameter "n_neighbors"*
 
