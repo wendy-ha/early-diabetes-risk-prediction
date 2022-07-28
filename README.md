@@ -120,7 +120,7 @@ On the other hand, blood pressure, insulin, and skin thickness also affect the l
 
 ![image](https://user-images.githubusercontent.com/90888090/175817240-a495dae4-88b0-4ca6-b68d-e47761ac01f4.png)
 
-### Building Base Model
+### Building Base Models (Reusable functions) for repeated tasks
 - Base function to find best value of the hyperparameter
 
 ![image](https://user-images.githubusercontent.com/90888090/175817025-66e56e19-5129-48cd-ba80-edd255cb7a21.png)
