@@ -59,7 +59,7 @@
 	</tr>
  </table> 
   
-- Author: Wendy Ha (Swinburne University of Technology)
+- Author: Wendy Ha
 - Dataset: https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
 ## Objectives
 Diabetes, according to the World Health Organization, is a chronic disease that occurs when blood glucose levels are abnormally high, posing a risk to several body organs such as the heart, eyes, kidneys, and lungs (World Health Organization 2020). There is currently no cure for diabetes, but it is possible to predict an individual's likelihood of developing the disease using medical indicators such as blood pressure, glucose levels, insulin levels and genetics.
