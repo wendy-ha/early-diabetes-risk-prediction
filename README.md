@@ -74,7 +74,19 @@ Recognizing the importance of early diabetes diagnosis, this project utilised th
 The histogram above indicates that <b>Glucose</b> and <b>BloodPressure</b> have roughly normal distributions; hence, null values in these columns can be replaced with the <b>MEAN</b>.<br/><br/>
 For <b>Insulin, SkinThickness, and BMI,</b> the data skew to the left is excessively pronounced; hence, the <b>MEDIAN</b> should be used to replace null values.
 
-![image](https://user-images.githubusercontent.com/90888090/175816406-97151a0a-2576-490b-bce9-4dbf37dd9df0.png)
+```ruby
+# Filling null values in 'Insulin', 'SkinThickness', 'BMI' columns with the MEDIAN.
+for col in ['Insulin', 'SkinThickness', 'BMI']:
+    asm2_data[col] = asm2_data[col].fillna(asm2_data[col].median())
+#asm2_data['Insulin', 'SkinThickness', 'BMI'] = asm2_data['Insulin'].fillna(asm2_data['Insulin'].median()) 
+```
+
+```ruby
+# Filling null values in Glucose, BloodPressure columns with the MEAN.
+for col in ['Glucose', 'BloodPressure']:
+    asm2_data[col] = asm2_data[col].fillna(asm2_data[col].mean())
+```
+
 - The project data set no longer contains missing values.
 
 ![image](https://user-images.githubusercontent.com/90888090/175816435-36b4b377-b4b6-4074-8e3f-e0707f96ebe0.png)
@@ -122,32 +134,86 @@ On the other hand, blood pressure, insulin, and skin thickness also affect the l
 
 ### Building Base Models (Reusable functions) for repeated tasks
 - Base function to find best value of the hyperparameter
+```ruby
+def tune_hyperparameter (model, x_train, y_train, isKnn = True):
+    print ('Find best value for hyperparameter by GridSearchCV')
+    print(15*'-')
+    if isKnn == True:
+        para = {'n_neighbors':np.arange(1,11)}
+    else:
+        para = {'max_depth':np.arange(1,11)}
+    model_cv= GridSearchCV(model,para, cv=10)
+    model_cv.fit(x_train, y_train)   
+    print("- Best cv_scores:" + str(model_cv.best_score_))
+    print("- Best parameter: " + str(model_cv.best_params_)) 
+```
 
-![image](https://user-images.githubusercontent.com/90888090/175817025-66e56e19-5129-48cd-ba80-edd255cb7a21.png)
 - Base function to evaluate performance of each chosen classification model
-
-![image](https://user-images.githubusercontent.com/90888090/175817043-94b17e93-4b1a-49ba-80fb-5d5bb2d03000.png)
+```ruby
+def model_evaluation(model, x_train, y_train, x_test, y_test, train = True):
+    #Train set
+    if train == True:
+        y_train_pred = model.predict(x_train)
+        print("\n"+35*'*'+"\n")
+        print ('\033[1m TRAIN RESULT  \033[0m'+"\n")
+        print (f"1/ Confusion Matrix: \n {confusion_matrix(y_train, y_train_pred)}")
+        print(f"2/ Accuracy Score: {accuracy_score(y_train, y_train_pred)}")
+        print(f"3/ F1 Score: {f1_score(y_train, y_train_pred, average='weighted')}")
+        print(f"4/ Classification Report: \n {classification_report(y_train, y_train_pred)}")
+    #Test set
+    if train == False:
+        y_test_pred = model.predict(x_test)
+        print("\n" + 35*'*'+"\n")
+        print ('\033[1m TEST RESULT  \033[0m'+"\n")
+        print (f"1/ Confusion Matrix: \n {confusion_matrix(y_test, y_test_pred)}")
+        print(f"2/ Accuracy Score: {accuracy_score(y_test, y_test_pred)}")
+        print(f"3/ F1 Score: {f1_score(y_test, y_test_pred, average='weighted')}")
+        print(f"4/ Classification Report: \n {classification_report(y_test, y_test_pred)}")
+```
 
 - Base function to compare performance of 02 chosen classification models
-
-![image](https://user-images.githubusercontent.com/90888090/175817070-641187fb-86cd-4e12-9502-32d809e8ddf2.png)
+```ruby
+def model_comparision(model_1, model_2, x_test, y_test):
+    y_test_pred1 = model_1.predict(x_test)
+    y_test_pred2 = model_2.predict(x_test)
+    as_1 = accuracy_score(y_test, y_test_pred1)
+    as_2 = accuracy_score(y_test, y_test_pred2)
+    f1_sc1=f1_score(y_test, y_test_pred1, average='weighted')
+    f1_sc2=f1_score(y_test, y_test_pred2, average='weighted')
+    model_cp = {}
+    model_cp['K-nearest Neighbors Classifier'] = [as_1, f1_sc1]
+    model_cp['Decision Tree Classifier'] = [as_2, f1_sc2]
+    model_cp_df = pd.DataFrame.from_dict(model_cp).T
+    model_cp_df.columns = ['Accuracy', 'F1 Score']
+    return model_cp_df
+```
 
 - Base function to visualise comparison metrics of 02 chosen classification model
-
-![image](https://user-images.githubusercontent.com/90888090/175817099-66b32a64-44bb-4023-9b20-c35e5baf81ba.png)
+```ruby
+def model_compare_visual (data):
+    data.plot(kind="barh", figsize=(12, 10))
+    plt.title("Classification Models Comparison for splitting dataset ", fontsize=18, pad=20)
+    plt.xlabel("Metrics", fontsize=13)
+    plt.ylabel("Type of Classification Model", fontsize=13)
+    plt.show()
+```
 
 ## Applying Base model for data partitioning: 80% for training and 20% for testing
 ### Model 1: K-nearest Neighbors Algorithm
 - *Find best value of the hyperparameter "n_neighbors"*
-
-![image](https://user-images.githubusercontent.com/90888090/175817358-14afb8e4-99e7-4a0f-8f30-2a658b73884a.png)
+```ruby
+knn_core1 = KNeighborsClassifier()
+tune_hyperparameter (knn_core1, X_train1, y_train1, True)
+```
 - *Evaluate K-nearest Neighbors Algorithm Performance*
 
 ![image](https://user-images.githubusercontent.com/90888090/175817392-592f08ae-76b5-4626-9724-6c553cc1979e.png)
 ### Model 2: Decision Tree Algorithm
 - *Find best value of the hyperparameter "max_depth"*
-
-![image](https://user-images.githubusercontent.com/90888090/175817471-bb35e9ac-3b1c-4885-af1f-f5f0fe65aba3.png)
+```ruby
+dt_core1 = DecisionTreeClassifier()
+tune_hyperparameter (dt_core1 , X_train1, y_train1, False)
+```
 - *Evaluate Decision Tree Algorithm Performance*
 
 ![image](https://user-images.githubusercontent.com/90888090/175817503-959ca586-885b-42e2-a6c7-2df9d8490ced.png)
